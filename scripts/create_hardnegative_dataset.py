@@ -310,6 +310,76 @@ for _, row in candidates.iterrows():
 
 
 candidates["slope"] = candidate_slopes
+# ============================================================
+# LOAD ASPECT RASTER
+# ============================================================
+
+ASPECT_PATH = BASE_DIR / "data" / "processed" / "aspect.tif"
+
+if not ASPECT_PATH.exists():
+    raise FileNotFoundError(
+        f"Aspect raster not found: {ASPECT_PATH}"
+    )
+
+aspect_src = rasterio.open(ASPECT_PATH)
+
+aspect_array = aspect_src.read(1)
+
+print("\nAspect raster:")
+print(f"Path: {ASPECT_PATH}")
+print(f"CRS: {aspect_src.crs}")
+print(f"Size: {aspect_src.width} x {aspect_src.height}")
+
+
+# ============================================================
+# EXTRACT ASPECT
+# ============================================================
+
+candidate_aspects = []
+
+for _, row in candidates.iterrows():
+
+    try:
+        aspect_row, aspect_col = aspect_src.index(
+            row["longitude"],
+            row["latitude"]
+        )
+
+        if (
+            aspect_row < 0
+            or aspect_row >= aspect_src.height
+            or aspect_col < 0
+            or aspect_col >= aspect_src.width
+        ):
+            candidate_aspects.append(np.nan)
+            continue
+
+        aspect_value = aspect_array[
+            aspect_row,
+            aspect_col
+        ]
+
+        if np.isfinite(aspect_value):
+            candidate_aspects.append(
+                float(aspect_value)
+            )
+        else:
+            candidate_aspects.append(np.nan)
+
+    except Exception:
+        candidate_aspects.append(np.nan)
+
+
+candidates["aspect"] = candidate_aspects
+
+candidates = candidates.dropna(
+    subset=["elevation", "slope", "aspect"]
+).reset_index(drop=True)
+
+print(
+    f"Valid candidates after aspect extraction: "
+    f"{len(candidates)}"
+)
 
 candidates = candidates.dropna(
     subset=["elevation", "slope"]
@@ -518,13 +588,13 @@ for i, row in hard_negatives.iterrows():
         continue
 
     record = {
-        "latitude": row["latitude"],
-        "longitude": row["longitude"],
-        "elevation": row["elevation"],
-        "slope": row["slope"],
-        "aspect": 0.0,
-        "label": 0,
-    }
+    "latitude": row["latitude"],
+    "longitude": row["longitude"],
+    "elevation": row["elevation"],
+    "slope": row["slope"],
+    "aspect": row["aspect"],
+    "label": 0,
+}
 
     record.update(features)
 
