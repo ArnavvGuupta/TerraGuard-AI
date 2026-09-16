@@ -15,3 +15,5 @@ data/processed/monitoring/*.tif
 
 # Large trained models
 data/*.pkl
+
+
