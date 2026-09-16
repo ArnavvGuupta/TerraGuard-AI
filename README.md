@@ -1,5 +1,6 @@
 # 🌍 TerraGuard AI
-<img width="1333" height="1052" alt="Screenshot 2026-09-16 112247" src="https://github.com/user-attachments/assets/5e9c54a9-d2f4-4350-8075-ba19275238f9" />
+<img width="1712" height="962" alt="Screenshot 2026-09-09 234343" src="https://github.com/user-attachments/assets/782e04ff-e10c-49df-8061-f60b12ef2ba3" />
+
 
 
 ### AI-Powered Landslide Risk Monitoring & Early Warning System
